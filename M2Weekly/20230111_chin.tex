@@ -1,0 +1,142 @@
+%\documentstyle[epsf,twocolumn]{jarticle}       %LaTeX2.09�d�l
+%\documentclass[twocolumn]{jarticle} 
+\documentclass[draftclsnofoot,onecolumn]{jarticle}
+\usepackage{float} %设置图片浮动位置的宏包
+\usepackage{subfigure} %插入多图时用子图显示的宏包
+\usepackage{url}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%
+%%  n�{ �o�[�W����
+%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\setlength{\topmargin}{-45pt}
+%\setlength{\oddsidemargin}{0cm} 
+\setlength{\oddsidemargin}{-7.5mm}
+%\setlength{\evensidemargin}{0cm} 
+\setlength{\textheight}{24.1cm}
+%setlength{\textheight}{25cm} 
+\setlength{\textwidth}{17.4cm}
+%\setlength{\textwidth}{172mm} 
+\setlength{\columnsep}{11mm}
+
+
+%�y�߂������邲�Ƃ�(1.1)(1.2) �c(2.1)(2.2)�Ɛ����ԍ��������Ƃ��z
+%\makeatletter
+%\renewcommand{\theequation}{%
+%\thesection.\arabic{equation}} %\@addtoreset{equation}{section}
+%\makeatother
+
+%\renewcommand{\arraystretch}{0.95} �sT�̐ݒ�
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage[dvipdfmx]{graphicx}   %pLaTeX2e�d�l(�v\documentstyle ->\documentclass)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+\onecolumn
+\noindent
+
+\hspace{1em}
+
+\ \ 令和 5 年 1 月 11 日 ( 水 ) ゼミ資料 
+\hfill
+\ \ M2 陳偉斉
+
+
+\vspace{2mm}
+
+\hrule
+
+\begin{center}
+{\Large \bf 進捗報告}
+\end{center}
+
+
+\hrule
+\vspace{3mm}
+
+\section{今週やったこと}
+	\begin{itemize}
+	  \item baseline 実験\vspace{-0.5em}
+	\end{itemize}
+
+\section{実験内容}
+SVM, LSTM, bert-base-chinese モデルに対して実験しました.
+
+\section{データセット}
+「問題文 + ヒント + 答え」,「正解」で構成されるの実験データ 72937 件集まりました.
+そして Levenshteinを利用し,「不正解だけと似てる漢字(画と SUB 漢字両方も Levenshtein 距離が1)」の条件でデータ数を 218811 件に増加しました.
+bert-base-chinese モデルのみに対して,「明らかに不正解 ( 画と SUB 漢字両方も Levenshtein 距離が 20 以上)」と「ヒントなし」の条件を設定し実験をしました.他のモデルはまだ実験中です.
+
+データセットの構成は表 1 のように示します.
+
+\begin{table}[h]
+\centering
+\caption{データセットの構成}
+\label{a}
+\centering
+\resizebox{\linewidth}{!}{
+\begin{tabular}{|c|c|c|c|}
+\hline 条件 & 訓練データ & テストデータ & 合計\\
+\hline 似てる不正解 & 175048 & 43763 & 218811\\
+\hline 明らかに不正解 & 175048 & 43763 & 218811\\
+\hline ヒントなし & 175048 & 43763 & 218811\\
+\hline
+\end{tabular}
+}
+\end{table}
+
+\section{実験結果}
+
+実験結果は表 2 ,表 3 に示します.
+
+\begin{table}[h]
+\centering
+\caption{各モデルの実験結果}
+\label{b}
+\centering
+\resizebox{\linewidth}{!}{
+\begin{tabular}{|c|c|c|c|c|}
+\hline 結果 & SVM(CountVectorizer) & SVM(TfidfVectorizer) & LSTM(bidirectional) & bert-base-chinese\\
+\hline 訓練誤差 &  &  & 0.21 & 0.21\\
+\hline 訓練精度 & 0.67 & 0.68 & 0.90 & 0.90\\
+\hline テスト精度 & 0.66 & 0.56 & 0.86 & 0.78\\
+\hline
+\end{tabular}
+}
+\end{table}
+
+その中に最も表現がいいのは LSTM モデルですが, Bert の訓練は時間かかりますので, 毎回 20 Epoch を設定しました(コスト 6 時間).それに反して, LSTM は 50 Epoch dでした. 故に Bert モデルは訓練不足の可能性もあります. 
+
+\begin{table}[h]
+\centering
+\caption{Bertと違うデータセットの実験結果}
+\label{c}
+\centering
+\resizebox{\linewidth}{!}{
+\begin{tabular}{|c|c|c|c|}
+\hline 条件 & 似てる不正解 & 明らかに不正解 & ヒントなし\\
+\hline 訓練誤差 & 0.21 & 0.16 & 0.40\\
+\hline 訓練精度 & 0.90 & 0.94 & 0.85\\
+\hline テスト精度 & 0.78 & 0.76 & 0.78\\
+\hline
+\end{tabular}
+}
+\end{table}
+結果として,人類の判断に影響する「漢字の形」と「ヒント」が bert-base-chinese に与える影響は僅かですが,今回の実験は全部漢字を最小単位として扱うため,画と SUB 漢字は今回の実験に導入されてません.次に導入します.
+\section{来週目標}
+　\begin{itemize}
+	\item Bert を 100 epoch に増加し実験する
+	\item 不正解データを増加し実験する
+	\item 画と SUB 漢字を導入する(データの中に分けるか,分散表現を生成するか)
+
+	\end{itemize}
+
+
+\bibliography{weekly}
+\bibliographystyle{junsrt}
+
+\end{document}
+
+
